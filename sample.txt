@@ -1,0 +1,9 @@
+CRUD
+
+CREATE (ui true)
+
+READ (ui true)
+
+UPDATE (ui true)
+
+DELETE (nal nal lay)
