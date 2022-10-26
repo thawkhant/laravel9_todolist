@@ -58,6 +58,32 @@ class PostController extends Controller
     }
 
 
+    // direct update page
+
+    public function updatePage($id){
+       // dd($id);
+        $post = POST::where("id",$id)->get()->toArray();
+       // $post = POST::first()->toArray();
+        // $post = POST::where('id',$id)->first()->toArray();   // d lo yae mal so yin 0 kan dwe pyoke yone bl
+       // dd($post);
+        return view('update',compact('post'));
+    }
+
+
+    // edit page
+
+    public function editPage($id){
+        $post = POST::where('id',$id)->first()->toArray(); // ma tu det method ko use lite dar
+        return view('edit',compact('post'));
+    }
+
+    // update page
+
+    public function update(Request $request){
+        dd($request->all());
+    }
+
+
 
     //-----------------------------------------------------------------------------
 
