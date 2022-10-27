@@ -6,6 +6,12 @@
      <div class="row mt-5">
          <div class="col-5 ">
              <div class="p-3">
+                <div class="alert-message">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>ဂုဏ်ယူပါတယ်။ ပို့စ်ကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
                  <form action="{{route('post#create')}}" method="POST">
                     @csrf
                     <div class="text-group mb-3">

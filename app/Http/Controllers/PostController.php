@@ -79,9 +79,34 @@ class PostController extends Controller
 
     // update page
 
+    // public function update(Request $request){      // create net ru tu bal mot 
+    //     // dd($request->all());
+    //     $updateData = $this->getupdateData($request);
+    //     dd($updateData);
+    // }
+
     public function update(Request $request){
-        dd($request->all());
+        // dd($request->all());
+       // dd($request->all());
+        $updateData = $this->getPostData($request);  // must be array
+        $id = $request->postId;
+        // dd($id);
+       // dd($updateData);
+
+        Post::where("id",$id)->update($updateData);  // al lo pyint phot data ka array format pyint ya ml
+        return redirect() ->route('post#home');
     }
+
+    // get update data
+    // private function getupdateData($request){    // loke soung chint a tu tu bet mot kwal ma write taw bu
+    //     return [
+    //         'title' => $request->updateName,
+    //         'description' => $request->updateDescription
+    //     ];
+    // }
+
+
+
 
 
 
@@ -90,7 +115,7 @@ class PostController extends Controller
 
     // get post data private function // equal with upper once sir
 
-    private function getPostData($request){
+    private function getPostData($request){        // de function ko 2 nay yar ka call htar dal
   // dd("this is private function call test");
         $respond = [
          'title' => $request->postTitle,
