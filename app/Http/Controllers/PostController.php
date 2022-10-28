@@ -4,14 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
     // customer create page
     public function create(){
         // database htal ka data yu dr
-        $posts = Post::orderBy('created_at','desc')->get()->toArray();  // === Select * From blahh blahh...
-         // dd($posts[0]['title']);
+         
+       //$posts = Post::orderBy('created_at','desc')->get()->toArray();  // === Select * From blahh blahh...
+        
+         
+         
+
+         $posts = Post::orderBy('created_at','desc')->paginate(3);  // paginate loke dr sir
+         // dd($posts);
+        // dd($posts[0]['title']);
         // dd($posts->toArray());
         return view('create',compact('posts'));  // a shay mar compact ko lat lar p b
     }
@@ -19,6 +27,12 @@ class PostController extends Controller
 
     // post create
     public function postCreate(Request $request){
+
+       Validator::make($request->all(),[     // Validation section pr sir 
+        'postTitle' => 'required',
+        'postDescription' => 'required'
+       ])->validate();   // import lal loke pay ya oak mal  
+
        // dd($request->all());
 
         // $data = [
@@ -32,7 +46,7 @@ class PostController extends Controller
        //  return back();  // de har ka A page to => A page ko bal ya dal
       // return redirect('testing'); // url ka yu dar
       // return redirect()->route('testing');  // route ka yu dar  by name
-       return redirect()->route('post#createPage');  // she dar
+       return redirect()->route('post#createPage')->with(['insertSuccess'=>'ဂုဏ်ယူပါတယ်။ ပို့စ်ကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ']);  // she dar    // with net ka temporary section ko use lite dar
 
          // dd($data);
 
@@ -94,7 +108,7 @@ class PostController extends Controller
        // dd($updateData);
 
         Post::where("id",$id)->update($updateData);  // al lo pyint phot data ka array format pyint ya ml
-        return redirect() ->route('post#home');
+        return redirect() ->route('post#home')->with(['updateSuccess'=>'ဂုဏ်ယူပါတယ်။ ပို့စ်ကို အောင်မြင်စွာ မွမ်းမံပြီးပါပြီ']);    // with net ka temporary section ko use lite dar;
     }
 
     // get update data

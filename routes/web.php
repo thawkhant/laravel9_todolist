@@ -3,8 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 
+ 
+// Route::reditect('URI','URI',301);
 
-
+// Route::redirect("/","customer/createPage")->name('post#home'); // thu ka poung yae dar // more clean         
 Route::get("/",[PostController::class,'create'])->name('post#home');
 Route::get("customer/createPage",[PostController::class,"create"])->name("post#createPage");
 Route::post("post/create",[PostController::class,"postCreate"])->name("post#create");

@@ -17,9 +17,7 @@
 				<!-- <textarea class="form-control my-3" name="updateDescription" id="" cols="30" rows="10" placeholder="Enter Post Description...">
 					{{$post['description']}}
 				</textarea> -->
-				<textarea class="form-control my-3" name="postDescription" id="" cols="30" rows="10" placeholder="Enter Post Description...">
-					{{$post['description']}}
-				</textarea>
+				<textarea class="form-control my-3" name="postDescription" id="" cols="30" rows="10" placeholder="Enter Post Description...">{{$post['description']}}</textarea>
 
 				<input type="submit" value="Update" name="" class="btn bg-dark text-white my-3 float-end"> 
 			</form>

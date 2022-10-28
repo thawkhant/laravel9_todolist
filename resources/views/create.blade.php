@@ -6,21 +6,51 @@
      <div class="row mt-5">
          <div class="col-5 ">
              <div class="p-3">
+
+               @if(session('insertSuccess'))
                 <div class="alert-message">
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>ဂုဏ်ယူပါတယ်။ ပို့စ်ကို အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ</strong>
+                    <strong>{{session('insertSuccess')}}</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 </div>
+               @endif
+
+                @if(session('updateSuccess'))
+                <div class="alert-message">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{session('updateSuccess')}}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+               @endif
+
+          <!--   @if ($errors->any())              laravel doc ka copy lar dar 
+            <div class="alert alert-danger">
+                  <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+                 </ul>
+            </div>
+            @endif -->
+
                  <form action="{{route('post#create')}}" method="POST">
                     @csrf
                     <div class="text-group mb-3">
                      <label for="" class="mb-2">ခေါင်းစဉ်</label>
-                     <input type="text" name="postTitle" class="form-control" placeholder="ပို့စ်ခေါင်းစဉ်ထည့်ပါ..." required>
+                     <input type="text" name="postTitle" class="form-control @error('postTitle') is-invalid @enderror" placeholder="ပို့စ်ခေါင်းစဉ်ထည့်ပါ..." value="{{old('postTitle')}}"><!-- value a hong kyan aung lot  -->
+                                    
+                    @error('postTitle')
+                        <small class="invalid-feedback">ပို့စ်ခေါင်းစဉ်ကို ဖြည့်ရပါမည်</small>        
+                    @enderror 
                  </div>
                  <div class="text-group mb-3">
                      <label for="" class="mb-2">ဖော်ပြချက်</label>
-                     <textarea name="postDescription" class="form-control" cols="30" rows="10" placeholder="ပို့စ်ဖော်ပြချက်ကို ရိုက်ထည့်ပါ " required></textarea>
+                     <textarea name="postDescription" class="form-control  @error('postDescription') is-invalid @enderror" cols="30" rows="10" placeholder="ပို့စ်ဖော်ပြချက်ကို ရိုက်ထည့်ပါ ">{{old('postDescription')}}</textarea>
+                     @error("postDescription")
+                     <small class="text-danger">ပို့စ်ဖော်ပြချက်ကို ဖြည့်စွက်ရပါမည်</small> 
+                     @enderror
                  </div>
                  <div class="mb-3">
                      <input type="submit" name="" value="ပို့စ်ဖန်တီးရန်" class="btn btn-danger">
@@ -29,9 +59,12 @@
              </div>
          </div>
          <div class="col-7 ">
+            <h3 class="mb-3">
+                Total - {{$posts->total()}}   <!-- pagination ka ya lar dar pr sir  // dd net kyi bee yu dr -->
+            </h3>
              <div class="data-container">
                   
-                  @foreach ($posts as $item)            <!-- foreach -->
+                  @foreach ($posts as $item)   <!-- foreach -->
                   <div class="post p-3 shadow-lg mb-4" style="cursor:pointer">
                     <div class="row">
                      <h5 class="col-7">{{$item['title']}} <!-- | {{$item['id']}} --></h5>
@@ -80,6 +113,10 @@
 
                
              </div>
+
+           
+        {{$posts->links()}}    <!--  pagination a twint pr sir // looping ye a pyin mar write ya dal // provider mar lal import loke pay ya oak ml -->
+
          </div>
      </div>
  </div>
