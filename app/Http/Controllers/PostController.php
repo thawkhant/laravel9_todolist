@@ -11,11 +11,11 @@ class PostController extends Controller
     // customer create page
     public function create(){
         // database htal ka data yu dr
-         
+
        //$posts = Post::orderBy('created_at','desc')->get()->toArray();  // === Select * From blahh blahh...
-        
-         
-         
+
+
+
 
          $posts = Post::orderBy('created_at','desc')->paginate(3);  // paginate loke dr sir
          // dd($posts);
@@ -28,12 +28,16 @@ class PostController extends Controller
     // post create
     public function postCreate(Request $request){
 
-       Validator::make($request->all(),[     // Validation section pr sir 
-        'postTitle' => 'required',
-        'postDescription' => 'required'
-       ])->validate();   // import lal loke pay ya oak mal  
+//       Validator::make($request->all(),[     // Validation section pr sir
+//        'postTitle' => 'required|min:5|max:10|unique:posts,title',  // posts ka database name / post table mar unique pyint ya mal lot pyaw dar  // table name htal ka coloumn name
+//        'postDescription' => 'required|min:5'
+//       ])->validate();   // import lal loke pay ya oak mal
 
-       // dd($request->all());
+         $this->postValidationCheck($request);  // private function net twar write dar
+
+
+
+        // dd($request->all());
 
         // $data = [
         //  'title' => $request->postTitle,
@@ -75,6 +79,7 @@ class PostController extends Controller
     // direct update page
 
     public function updatePage($id){
+
        // dd($id);
         $post = POST::where("id",$id)->get()->toArray();
        // $post = POST::first()->toArray();
@@ -93,13 +98,14 @@ class PostController extends Controller
 
     // update page
 
-    // public function update(Request $request){      // create net ru tu bal mot 
+    // public function update(Request $request){      // create net ru tu bal mot
     //     // dd($request->all());
     //     $updateData = $this->getupdateData($request);
     //     dd($updateData);
     // }
 
     public function update(Request $request){
+        $this->postValidationCheck($request);   // validtion section a twint pr sir
         // dd($request->all());
        // dd($request->all());
         $updateData = $this->getPostData($request);  // must be array
@@ -135,8 +141,34 @@ class PostController extends Controller
          'title' => $request->postTitle,
          'description' => $request->postDescription
         ];
-       
+
        return $respond;     // private function ka return pyan pay ya dal
 
     }
+
+
+  // post validation check
+
+
+   private function postValidationCheck($request){
+
+    $validationRules = [     // Validation section pr with next pone san
+        'postTitle' => 'required|min:5|max:10|unique:posts,title',  // posts ka database name / post table mar unique pyint ya mal lot pyaw dar  // table name htal ka coloumn name
+        'postDescription' => 'required|min:5'
+    ];
+
+    $validationMessage = [
+        'postTitle.required' => 'ဖြည့်စွက်ရန် လိုအပ်ပါသည်',
+        'postDescription.required' => 'ဖြည့်စွက်ရန် လိုအပ်ပါသည်',
+        'postTitle.min' => "စာလုံးငါးလုံးနှင့်အထက် ဖြည့်ရပါမည်",
+        'postTitle.unique' => 'ခေါင်းစဉ်ဟောင်းနှင့် ကွဲပြားရပါမည်',
+        'postTitle.max' => 'ဆယ်လုံးထက်နည်းရမည်'
+    ];
+
+    Validator::make($request->all(),$validationRules,$validationMessage)->validate();
 }
+
+}
+
+
+
