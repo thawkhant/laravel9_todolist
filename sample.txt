@@ -7,3 +7,8 @@ READ (ui true)
 UPDATE (ui true)
 
 DELETE (nal nal lay)
+
+----------------------------
+
+ Factory > Seeder > Database Seeder
+
