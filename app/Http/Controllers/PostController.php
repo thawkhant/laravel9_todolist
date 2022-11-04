@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
@@ -17,8 +18,37 @@ class PostController extends Controller
 
 
 
-         $posts = Post::orderBy('created_at','desc')->paginate(3);  // paginate loke dr sir
-         // dd($posts);
+//         $posts = Post::orderBy('created_at','desc')->paginate(3);  // paginate loke dr sir
+           // $posts = Post::where("id","<","6")->where('address','=','myeik')->get();
+           // $posts = Post::get();
+           //  $posts = Post::first();
+           //   $posts = Post::get()->last();
+           // $posts = Post::pluck('title');
+           //$posts = Post::select("title","price")->get();
+           // $posts = Post::where("id","<","6")->pluck("title",'address');
+          // $posts = Post::get()->random();
+        // $posts = Post::where("id","<","10")->get()->random();     // all === get // all ma ya yin get thone
+        //  $posts = Post::where("id","<",20)->where("address","=","Myeik")->get();  // where = &&  // orWhere ||
+         // $posts = Post::orWhere("id","<",20)->orWhere("address","=","Myeik")->get();
+         //  $posts = Post::orderBy('id','asc')->get();
+        // $posts = Post::orderBy('price','desc')->get();
+       // $posts = Post::whereBetween("price",[3000,5000])->get();
+//        $posts = Post::select('id','address','price')->where('address','yangon')->whereBetween("price",[3000,5000])->orderBy("price","asc")->dd();
+
+       // $posts = Post::select('id','address','price')->where('address','yangon')->whereBetween("price",[3000,5000])->orderBy("price","asc")->get();
+            // $posts = Post::where('address','yangon')->orderBy("price",'asc')->value("title"); // select net yae dar po kaung dl
+
+        // $posts = Post::find(3);  // id ko yu lite dr // a pow mar si dal where net yu dar
+        // $posts = Post::max("price");
+        // $posts = Post::min("price");
+       // $posts = Post::average("price");
+       // $posts = Post::where('address','myeik')->exists();
+       // $posts = Post::select("id",'title as post_title','title as post_b_title')->get();
+        $posts = Post::select('rating',DB::raw('COUNT(rating) as rating_count'),DB::raw('SUM(price) as total_price'))->groupBy('rating')->get();
+        dd($posts->toArray());
+
+
+        // dd($posts);
         // dd($posts[0]['title']);
         // dd($posts->toArray());
         return view('create',compact('posts'));  // a shay mar compact ko lat lar p b
@@ -81,7 +111,10 @@ class PostController extends Controller
     public function updatePage($id){
 
        // dd($id);
-        $post = POST::where("id",$id)->get()->toArray();
+//        $post = POST::where("id",$id)->get()->toArray();
+        $post = POST::where("id",$id)->get(); //array ko pyoke dl cuzz arrary net so ma ya lot
+       // dd($post);
+       // dd($post); array format gyi
        // $post = POST::first()->toArray();
         // $post = POST::where('id',$id)->first()->toArray();   // d lo yae mal so yin 0 kan dwe pyoke yone bl
        // dd($post);
@@ -105,6 +138,7 @@ class PostController extends Controller
     // }
 
     public function update(Request $request){
+        // dd($request->postId);
         $this->postValidationCheck($request);   // validtion section a twint pr sir
         // dd($request->all());
        // dd($request->all());
@@ -152,10 +186,14 @@ class PostController extends Controller
 
    private function postValidationCheck($request){
 
-    $validationRules = [     // Validation section pr with next pone san
-        'postTitle' => 'required|min:5|max:10|unique:posts,title',  // posts ka database name / post table mar unique pyint ya mal lot pyaw dar  // table name htal ka coloumn name
-        'postDescription' => 'required|min:5'
-    ];
+
+           $validationRules = [     // Validation section pr with next pone san
+               'postTitle' => 'required|min:5|max:10|unique:posts,title,'.$request->postId,  // posts ka database name / post table mar unique pyint ya mal lot pyaw dar  // table name htal ka coloumn name
+               'postDescription' => 'required|min:5'   // apow ka har ka edit mar twar kyi
+           ];
+
+
+
 
     $validationMessage = [
         'postTitle.required' => 'ဖြည့်စွက်ရန် လိုအပ်ပါသည်',

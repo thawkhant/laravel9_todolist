@@ -70,10 +70,24 @@
                   <div class="post p-3 shadow-lg mb-4" style="cursor:pointer">
                     <div class="row">
                      <h5 class="col-7">{{$item['title']}} <!-- | {{$item['id']}} --></h5>
-                     <span class="col">{{$item['created_at']}}</span>
+{{--                     <span class="col">{{$item['created_at']}}</span>--}}
+                        <h5 class="col-4 offset-1">{{$item->created_at->format('d-M-Y')}}</h5>
                     </div>
                      <!-- <p class="text-muted">{{substr($item['description'],0,30)}}</p>  // pure php -->
                      <p class="text-muted">{{Str::words($item['description'],10,'...')}}</p>
+
+                      <span>
+                         <small> <i class="fas fa-money-bill text-success"></i> {{$item->price}} kyats</small>
+                      </span>
+                       |
+                      <span>
+                          <small><i class="fas fa-map-marker-alt text-danger"></i> {{$item->address}}</small>
+                      </span>
+                      |
+                      <span>
+                          <small><i class="fas fa-star text-warning"></i> {{$item->rating}}</small>
+                      </span>
+
                      <div class="text-end">
                    <!--  <a href="{{url('post/delete/' . $item['id'])}}">  // url nat twar dar -->
 
