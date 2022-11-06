@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
@@ -18,7 +17,9 @@ class PostController extends Controller
 
 
 
-//         $posts = Post::orderBy('created_at','desc')->paginate(3);  // paginate loke dr sir
+        //  $posts = Post::orderBy('created_at','desc')->paginate(3);  // paginate loke dr sir normal mode pr sir
+
+
            // $posts = Post::where("id","<","6")->where('address','=','myeik')->get();
            // $posts = Post::get();
            //  $posts = Post::first();
@@ -33,7 +34,7 @@ class PostController extends Controller
          //  $posts = Post::orderBy('id','asc')->get();
         // $posts = Post::orderBy('price','desc')->get();
        // $posts = Post::whereBetween("price",[3000,5000])->get();
-//        $posts = Post::select('id','address','price')->where('address','yangon')->whereBetween("price",[3000,5000])->orderBy("price","asc")->dd();
+      //$posts = Post::select('id','address','price')->where('address','yangon')->whereBetween("price",[3000,5000])->orderBy("price","asc")->dd();
 
        // $posts = Post::select('id','address','price')->where('address','yangon')->whereBetween("price",[3000,5000])->orderBy("price","asc")->get();
             // $posts = Post::where('address','yangon')->orderBy("price",'asc')->value("title"); // select net yae dar po kaung dl
@@ -44,9 +45,59 @@ class PostController extends Controller
        // $posts = Post::average("price");
        // $posts = Post::where('address','myeik')->exists();
        // $posts = Post::select("id",'title as post_title','title as post_b_title')->get();
-        $posts = Post::select('rating',DB::raw('COUNT(rating) as rating_count'),DB::raw('SUM(price) as total_price'))->groupBy('rating')->get();
-        dd($posts->toArray());
+       // $posts = Post::select('rating',DB::raw('COUNT(rating) as rating_count'),DB::raw('SUM(price) as total_price'))->groupBy('rating')->get();
+       // dd($posts->toArray());
 
+        // map  each through   // collection pyint nay ma use lot ya dal
+
+       // map each => paginate => data only pl ya dl   ***
+        // through => paginate => pagination + data    ***
+
+//        $posts = Post::get()->map(function($post){
+//            $post->title = strtoupper($post->title);
+//            $post->description = strtoupper($post->description);
+//
+//            return $post;
+//        });
+//
+//        $posts = Post::get()->each(function($post){
+//            $post->title = strtoupper($post->title);
+//            $post->description = strtoupper($post->description);
+//            $post->price = $post->price * 2;
+//
+//            return $post;
+//        });
+
+        // dd($posts->toArray());
+
+        // http://localhost:8000/customer/createPage?key=thawkhant
+       // dd($_REQUEST['key']);
+
+       // $searchKey = $_REQUEST['key'];   // pone san 1
+       //  $searchKey = request('key');   // pone san 2
+
+       // $post = Post::where('title','like','%'.$searchKey.'%')->get()->toArray();
+//
+//        $post = Post::when(request('key'),function($p){
+//            $searchKey = request('key');
+//            $p->where('title','like','%'.$searchKey.'%');
+//        })->get(); //key par yin function ko loke ma par yin get net yuu mr
+//        dd($post->toArray());
+
+
+//        $post = Post::when(request('key'),function($p){
+//            $searchKey = request('key');
+//            $p->where('title','like','%'.$searchKey.'%');
+//        })->paginate(5);
+//        dd($post->toArray());
+
+        // real search pr bro
+
+        $posts = Post::when(request("searchKey"),function($query){
+         $key = request('searchKey');
+         $query->orWhere('title','like','%'.$key.'%')->orWhere('description','like','%'.$key.'%');
+        })->orderBy('created_at','desc')->paginate(4);
+        // dd(count($posts));
 
         // dd($posts);
         // dd($posts[0]['title']);
@@ -57,13 +108,38 @@ class PostController extends Controller
 
     // post create
     public function postCreate(Request $request){
+       // dd($request->file('postImage'));
+       // dd($request->all());
+         // dd($request->file('postImage')->path());  // this is more smart // path ko pr kyi dar
+        // dd($request->file('postImage')->extension());  // file type ko kyi dar
+        // dd($request->file('postImage')->getClientOriginalName());  // thu ye name ko kyi dar
+       //  dd($request->postImage);
+      //  dd($request->hasFile('postImage') ? 'yes' : 'no'); // file shi ma shi check dar
+
+        $this->postValidationCheck($request);  // validation part pr sir
+        $data = $this->getPostData($request);   // private function ko pyan call nay dar  // array
+        //   dd($data);
+
+
+        if($request->hasFile('postImage')){
+//            $request->file('postImage')->store('myImage');  // myImage so dar storage aunt ka folder name
+            $fileName = uniqid(). "_thawkhant_".$request->file('postImage')->getClientOriginalName(); // photo dwe name tu yin overwrite pyint mar so lot unique pay lit dar
+            $request->file('postImage')->storeAs('myImage',$fileName);  // file name and type ko pr yu twar dr
+          //  dd("store success");
+
+            $data['image'] = $fileName;
+        }
+
+       // dd($data);
+
+       //  dd('not have photo');
 
 //       Validator::make($request->all(),[     // Validation section pr sir
 //        'postTitle' => 'required|min:5|max:10|unique:posts,title',  // posts ka database name / post table mar unique pyint ya mal lot pyaw dar  // table name htal ka coloumn name
 //        'postDescription' => 'required|min:5'
 //       ])->validate();   // import lal loke pay ya oak mal
 
-         $this->postValidationCheck($request);  // private function net twar write dar
+         // $this->postValidationCheck($request);  // private function net twar write dar  // apow ko pyoung like lot
 
 
 
@@ -74,7 +150,7 @@ class PostController extends Controller
         //  'description' => $request->postDescription
         // ];
 
-       $data = $this->getPostData($request);   // private function ko pyan call nay dar
+
        Post::create($data);  // database ko htal dr
        // return view('create');   // thu ye page ko pyan yout aung  // ma tu nyi det pages dwe ko twar dr
        //  return back();  // de har ka A page to => A page ko bal ya dal
@@ -172,8 +248,11 @@ class PostController extends Controller
     private function getPostData($request){        // de function ko 2 nay yar ka call htar dal
   // dd("this is private function call test");
         $respond = [
-         'title' => $request->postTitle,
-         'description' => $request->postDescription
+            'title' => $request->postTitle,
+            'description' => $request->postDescription,
+            'price' => $request->postFee,
+            'address' => $request->postAddress,
+            'rating' => $request->postRating
         ];
 
        return $respond;     // private function ka return pyan pay ya dal
@@ -188,19 +267,31 @@ class PostController extends Controller
 
 
            $validationRules = [     // Validation section pr with next pone san
-               'postTitle' => 'required|min:5|max:10|unique:posts,title,'.$request->postId,  // posts ka database name / post table mar unique pyint ya mal lot pyaw dar  // table name htal ka coloumn name
-               'postDescription' => 'required|min:5'   // apow ka har ka edit mar twar kyi
+               'postTitle' => 'required|min:5|max:20|unique:posts,title,'.$request->postId,  // posts ka database name / post table mar unique pyint ya mal lot pyaw dar  // table name htal ka coloumn name
+               'postDescription' => 'required|min:5',   // apow ka har ka edit mar twar kyi,
+               'postFee' => 'required',
+               'postAddress' => 'required',
+               'postRating' => 'required',
+//               'postImage' => 'required'
+               'postImage' => 'mimes:jpg,jpeg,png|file'
            ];
 
 
 
 
     $validationMessage = [
-        'postTitle.required' => 'ဖြည့်စွက်ရန် လိုအပ်ပါသည်',
-        'postDescription.required' => 'ဖြည့်စွက်ရန် လိုအပ်ပါသည်',
+        'postTitle.required' => 'ခေါင်းစဉ် ဖြည့်စွက်ရန် လိုအပ်ပါသည်',
+        'postDescription.required' => 'ဖော်ပြချက် ဖြည့်စွက်ရန် လိုအပ်ပါသည်',
+        'postDescription.min' => 'စာလုံးငါးလုံးနှင့်အထက် ဖြည့်ရပါမည်',
         'postTitle.min' => "စာလုံးငါးလုံးနှင့်အထက် ဖြည့်ရပါမည်",
         'postTitle.unique' => 'ခေါင်းစဉ်ဟောင်းနှင့် ကွဲပြားရပါမည်',
-        'postTitle.max' => 'ဆယ်လုံးထက်နည်းရမည်'
+        'postTitle.max' => 'ဆယ်လုံးထက်နည်းရမည်',
+         'postFee.required' => 'ကုန်ကျစရိတ်ဖြည့်စွက်ရန်လိုသည်',
+        'postAddress.required' => 'လိပ်စာ ဖြည့်စွက်ရန် လိုအပ်ပါသည်',
+        'postRating.required' => 'အဆင့်သတ်မှတ်ချက် ဖြည့်စွက်ရန် လိုအပ်ပါသည်',
+//        'postImage.required' => 'ဓာတ်ပုံဖြည့်ရန် လိုအပ်သည်'
+        'postImage.mimes' => 'ပို့စ်ဓာတ်ပုံသည် အမျိုးအစား jpg၊ jpeg၊ png ဖိုင်ဖြစ်ရမည်',
+        'postImage.file' => 'ပို့စ်ဓာတ်ပုံသည် ဖိုင်သာ ဖြစ်ရပါမည်။'
     ];
 
     Validator::make($request->all(),$validationRules,$validationMessage)->validate();
