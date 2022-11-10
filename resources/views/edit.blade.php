@@ -7,7 +7,7 @@
 		<div class="col-6 offset-3">
 
 
-			<form action="{{route('post#update')}}" method="POST">
+			<form action="{{route('post#update')}}" method="POST" enctype="multipart/form-data">
 				@csrf
 				<label>Post Title</label>
 				<input type="hidden" name="postId" value="{{$post['id']}}">  <!--  id ko ya yr dar  next level net -->
@@ -20,6 +20,27 @@
                 @enderror
                 <br>
 
+                <label>Image</label>
+                <div>
+                    @if($post['image'] == null)
+                        <div>
+                            <img src="{{asset('404image.png')}}" class="img-thumbnail mt-4 shadow">
+                        </div>
+                    @else
+                        <div>
+                            <img src="{{asset('storage/'. $post['image'])}}" class="img-thumbnail  shadow"  width="500px" height="300px">
+                        </div>
+                    @endif
+                </div>
+                <input type="file" name="postImage" class="form-control @error('postImage') is-invalid @enderror" value="{{old('postImage')}}">
+                @error("postImage")
+                <small class="text-danger">{{$message}}</small>
+                {{--                     <small class="text-danger">ပို့စ်ဖော်ပြချက်ကို ဖြည့်စွက်ရပါမည်</small>--}}
+                @enderror
+
+                <br>
+
+
                 <label>Post Description</label>
 				<!-- <textarea class="form-control my-3" name="updateDescription" id="" cols="30" rows="10" placeholder="Enter Post Description...">
 					{{$post['description']}}
@@ -29,7 +50,29 @@
                 <small class="text-danger">{{$message}}</small>
                 @enderror
 
-				<input type="submit" value="Update" name="" class="btn bg-dark text-white my-3 float-end">
+
+                <label>Post Fee</label>
+            <!-- <textarea class="form-control my-3" name="updateDescription" id="" cols="30" rows="10" placeholder="Enter Post Description...">
+                </textarea> -->
+                <input type="text" name="postFee" id="" class="form-control my-3  " placeholder="Enter post title..." value="{{ old('postTitle',$post['price']) }}" >
+
+
+
+
+                <label>Post Address</label>
+            <!-- <textarea class="form-control my-3" name="updateDescription" id="" cols="30" rows="10" placeholder="Enter Post Description...">
+                </textarea> -->
+                <input type="text" name="postAddress" id="" class="form-control my-3 " placeholder="Enter post title..." value="{{ old('postTitle',$post['address']) }}" >
+
+
+
+                <label>Post Rating</label>
+            <!-- <textarea class="form-control my-3" name="updateDescription" id="" cols="30" rows="10" placeholder="Enter Post Description...">
+                </textarea> -->
+                <input type="text" name="postRating" id="" class="form-control my-3  " placeholder="Enter post title..." value="{{ old('postTitle',$post['rating']) }}" >
+
+
+                <input type="submit" value="Update" name="" class="btn bg-dark text-white my-3 float-end">
 			</form>
 
 			<div class="my-3">

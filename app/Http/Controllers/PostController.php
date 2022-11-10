@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
@@ -124,7 +125,8 @@ class PostController extends Controller
         if($request->hasFile('postImage')){
 //            $request->file('postImage')->store('myImage');  // myImage so dar storage aunt ka folder name
             $fileName = uniqid(). "_thawkhant_".$request->file('postImage')->getClientOriginalName(); // photo dwe name tu yin overwrite pyint mar so lot unique pay lit dar
-            $request->file('postImage')->storeAs('myImage',$fileName);  // file name and type ko pr yu twar dr
+//            $request->file('postImage')->storeAs('myImage',$fileName);  // file name and type ko pr yu twar dr
+            $request->file('postImage')->storeAs('public',$fileName); // photo twe ka public aunt mar shi ma ya mar mot
           //  dd("store success");
 
             $data['image'] = $fileName;
@@ -223,6 +225,26 @@ class PostController extends Controller
         // dd($id);
        // dd($updateData);
 
+        // delete
+        // dd($request->all());
+        $oldImageName = Post::select('image')->where('id',$request->postId)->first()->toArray();
+        // dd($oldImageName);
+        $old = $oldImageName['image'];
+        // dd($oldImageName);\
+
+       if($old != null){    // null value dwe so ma pyint phot sint dar
+           Storage::delete('public/'.$old);
+       }
+
+       // dd($request->file('postImage'));  photo ko sintt nay dar
+        //   dd($request->hasFile('postImage') ? 'yes' : 'no');
+        // photo section a paw ka copy yu lar dar
+        if($request->hasFile('postImage')) {
+            $fileName = uniqid() . "_thawkhant_" . $request->file('postImage')->getClientOriginalName();
+            $request->file('postImage')->storeAs('public', $fileName);
+            $updateData['image'] = $fileName;  // updateData ka ma update loke dar
+        }
+
         Post::where("id",$id)->update($updateData);  // al lo pyint phot data ka array format pyint ya ml
         return redirect() ->route('post#home')->with(['updateSuccess'=>'ဂုဏ်ယူပါတယ်။ ပို့စ်ကို အောင်မြင်စွာ မွမ်းမံပြီးပါပြီ']);    // with net ka temporary section ko use lite dar;
     }
@@ -247,15 +269,23 @@ class PostController extends Controller
 
     private function getPostData($request){        // de function ko 2 nay yar ka call htar dal
   // dd("this is private function call test");
-        $respond = [
+        $data = [
             'title' => $request->postTitle,
             'description' => $request->postDescription,
-            'price' => $request->postFee,
-            'address' => $request->postAddress,
-            'rating' => $request->postRating
         ];
 
-       return $respond;     // private function ka return pyan pay ya dal
+        $data['price'] = $request->postFee == null ? 2000 : $request->postFee;
+        $data['address'] = $request->postAddress == null ? 'pyay' : $request->postAddress;
+        $data['rating'] = $request->postRating == null ? 4 : $request->postRating;
+        return $data;
+        // dd($data);
+
+           //   'price' => $request->postFee,
+           //   'address' => $request->postAddress,
+            //  'rating' => $request->postRating
+
+
+       // return $respond;     // private function ka return pyan pay ya dal
 
     }
 
@@ -267,13 +297,13 @@ class PostController extends Controller
 
 
            $validationRules = [     // Validation section pr with next pone san
-               'postTitle' => 'required|min:5|max:20|unique:posts,title,'.$request->postId,  // posts ka database name / post table mar unique pyint ya mal lot pyaw dar  // table name htal ka coloumn name
-               'postDescription' => 'required|min:5',   // apow ka har ka edit mar twar kyi,
-               'postFee' => 'required',
-               'postAddress' => 'required',
-               'postRating' => 'required',
-//               'postImage' => 'required'
-               'postImage' => 'mimes:jpg,jpeg,png|file'
+               'postTitle' => 'required|min:5|max:40|unique:posts,title,'.$request->postId,  // posts ka database name / post table mar unique pyint ya mal lot pyaw dar  // table name htal ka coloumn name
+               'postDescription' => 'required|min:5' , // apow ka har ka edit mar twar kyi,
+//               'postFee' => 'required',
+//               'postAddress' => 'required',
+//               'postRating' => 'required',
+////               'postImage' => 'required'
+             'postImage' => 'mimes:jpg,jpeg,png|file'
            ];
 
 
