@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Product;
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 
@@ -18,6 +20,22 @@ Route::post("post/create",[PostController::class,"postCreate"])->name("post#crea
   Route::get("post/updatePage/{id}",[PostController::class,'updatePage'])->name("post#updatePage");
   Route::get("post/editPage/{id}",[PostController::class,"editPage"])->name("post#editPage");
   Route::post("post/update",[PostController::class,"update"])->name("post#update");
+
+  // db relation test
+  Route::get('product/list',function(){
+    $data = Product::select('products.*','categories.name as category_name','categories.description')  // to avoid overwrite
+    ->join('categories','products.category_id','categories.id')
+    ->get();
+    dd($data->toArray());
+  });
+
+  Route::get('order/list',function(){
+    $data = Order::select('orders.customer_id','orders.product_id','customers.name as customer_name','customers.email','products.name as product_name')
+    ->join('customers','orders.customer_id','customers.id')
+    ->join('products','orders.product_id','products.id')
+    ->get();
+    dd($data->toArray());
+  });
 
 
 // Route::get("testing",function(){
